@@ -15,8 +15,8 @@ public class MainActivity extends AppCompatActivity {
 
     LinearLayout chessBoardLayout;
     Button buttonNewGame;
-    static final int rowBoard = 10;
-    static final int colBoard = 10;
+    static final int rowBoard = 15;
+    static final int colBoard = 15;
     final int winTotal = 5;
     static Cell[][] arrayCell ;// = new Cell[rowBoard][colBoard];
     static int[][] cellBoard; //= new int[rowBoard][colBoard];
@@ -534,32 +534,16 @@ public class MainActivity extends AppCompatActivity {
         int result = 0;
 
         if(level == 3){
-            int scoreCache = 0;
-            int minScore = 400000000;
-            cellBoard[cell.rowCell][cell.columnCell] = -1;
-            for(int i=0;i<rowBoard;i++)
-                for (int j=0;j<colBoard;j++)
-                    if(cellBoard[i][j] == 0){
 
-                        scoreCache = getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,1,1,flagAttack)
+            cellBoard[cell.rowCell][cell.columnCell] = -1;
+                      int  scoreCache = getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,1,1,flagAttack)
                                 + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,1,0,flagAttack)
                                 + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,-1,1,flagAttack)
                                 + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,0,1,flagAttack);
 
-
-                        if(scoreCache<=minScore){
-                            minScore = scoreCache;
-                        }
-                        if(minScore<preMAX){
-                            cellBoard[cell.rowCell][cell.columnCell] = 0;
-                            return minScore;
-                        }
-                    }
-
             cellBoard[cell.rowCell][cell.columnCell] = 0;
-            if(minScore > preMAX)
-                preMAX = minScore;
-            result = minScore;
+            return scoreCache;
+
         }
 
         if(level == 2 ){
@@ -570,18 +554,13 @@ public class MainActivity extends AppCompatActivity {
                 for (int j=0;j<colBoard;j++){
                     if(cellBoard[i][j] == 0){
                         scoreCache = getMax(arrayCell[i][j],level+1,flagAttack);
-                        scoreCache += getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,1,1,flagAttack)
-                                + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,1,0,flagAttack)
-                                + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,-1,1,flagAttack)
-                                + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,0,1,flagAttack);
 
                         if(scoreCache>=maxScore){
                             maxScore = scoreCache;
-                          //  preMAX = maxScore;
                         }
-                        if(maxScore>preMIN){
+                        if(scoreCache>preMIN){
                            cellBoard[cell.rowCell][cell.columnCell] = 0;
-                            return maxScore;
+                            return scoreCache;
                         }
                     }
                 }
@@ -606,11 +585,10 @@ public class MainActivity extends AppCompatActivity {
                         scoreCache = getMax(arrayCell[i][j],level+1,flagAttack);
                         if(scoreCache<=minScore){
                             minScore = scoreCache;
-                        //    preMIN = minScore;
                         }
-                        if(minScore<preMAX){
+                        if(scoreCache<preMAX){
                             cellBoard[cell.rowCell][cell.columnCell] = 0;
-                            return minScore;
+                            return  scoreCache;
                         }
                     }
                 }
@@ -662,7 +640,6 @@ public class MainActivity extends AppCompatActivity {
 
                 while (cellBoard[indexRow][indexCol] == playerTarget || cellBoard[indexRow][indexCol] == -playerTarget) {
 
-                  //  if(cellBoard[indexRow][indexCol] == playerTarget)
                            score += kScore;
                     if (cellBoard[indexRow][indexCol] == playerTarget && !flagInterrupt)
                         countStep++;
@@ -694,7 +671,6 @@ public class MainActivity extends AppCompatActivity {
 
                         flagInterrupt = true;
 
-                   //    break;
                     }
                 }
         }
@@ -706,7 +682,6 @@ public class MainActivity extends AppCompatActivity {
 
             while (cellBoard[indexRow][indexCol] == playerTarget || cellBoard[indexRow][indexCol] == -playerTarget) {
 
-                //  if(cellBoard[indexRow][indexCol] == playerTarget)
                 score += kScore;
 
                 if (cellBoard[indexRow][indexCol] == playerTarget && !flagInterrupt)
@@ -744,8 +719,6 @@ public class MainActivity extends AppCompatActivity {
                         countStep += 100;
 
                     flagInterrupt = true;
-
-                    //   break;
 
                 }
             }
