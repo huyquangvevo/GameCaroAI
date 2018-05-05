@@ -11,8 +11,11 @@
         android:id="@+id/button_new_game"
         android:layout_width="match_parent"
         android:layout_height="10dp"
-        android:layout_weight="0.06"
-        android:text="Button" />
+        android:layout_weight="0.04"
+        android:background="@drawable/new_game"
+        android:text="New Game"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@android:color/white" />
 
     <HorizontalScrollView
         android:layout_width="match_parent"
