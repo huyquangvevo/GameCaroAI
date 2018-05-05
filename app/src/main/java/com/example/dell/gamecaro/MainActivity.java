@@ -18,10 +18,9 @@ public class MainActivity extends AppCompatActivity {
     static final int rowBoard = 15;
     static final int colBoard = 15;
     final int winTotal = 5;
-    static Cell[][] arrayCell ;// = new Cell[rowBoard][colBoard];
-    static int[][] cellBoard; //= new int[rowBoard][colBoard];
+    static Cell[][] arrayCell ;
+    static int[][] cellBoard;
     Cell preCell;
-    boolean flagChoosen = true;
     boolean flagWin = false;
     int amountDefense = -1;
     int amountAttack = -1;
@@ -158,8 +157,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
 
-
-            return (amountDefense>=amountAttack)&&(amountDefense>=winTotal-1) ? resultDefense : resultAttack;
+               return ((amountDefense>=amountAttack)&&(amountDefense>=winTotal-1)&&(maxDefense>=maxAttack)) ? resultDefense : resultAttack;
         }
 
         protected void onPostExecute(Cell c){
@@ -419,8 +417,6 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             else if (cellBoard[indexRow][indexCol] == -cellBoard[indexRow + indexRowTarget][indexCol + indexColTarget])
                                 flagChange = false;
-                        if (flagChange)
-                            flagChoosen = flagAttack;
 
                     }
 
@@ -666,43 +662,13 @@ public class MainActivity extends AppCompatActivity {
                     indexRow += indexRowTarget;
                     indexCol += indexColTarget;
 
-                 /*   if (countStep >= winTotal - 2 ) {
-                      //  score += (countStep - winTotal + 3) * 1000;
-                        if(countStep == winTotal - 2)
-                            score += 1000;
-                        if(countStep == winTotal - 1 )
-                            score += 5000;
-                        if(!flagSpace)
-                            score += kScore*1000;
 
-                        if (countStep == winTotal)
-                            score += kScore* 100000;
-
-
-                    }
-                    */
-                     //   countStep1 = countStep;
                     if (indexRow < 0 || indexCol < 0 || indexRow >= rowBoard || indexCol >= colBoard)
                         break;
                     else if (cellBoard[indexRow][indexCol] == -cellBoard[indexRow - indexRowTarget][indexCol - indexColTarget]) {
 
-                     /*   if (countStep >= winTotal - 2) {
-                         //   countStep1 = countStep;
 
-                            if(countStep == winTotal - 2 && flagAttack){
-                                score -= (countStep - winTotal + 3)*1000;
-                                countStep = 1;
-                            }
-
-                            if((countStep == winTotal - 2 || countStep == winTotal -1 ) && !flagAttack){
-                                score -= (countStep - winTotal +3)*1000;
-                                countStep = 1;
-                            }
-
-
-                        } */
                         flagInterrupt1 = true;
-                      //  flagInterrupt = true;
 
                         break;
 
@@ -722,7 +688,6 @@ public class MainActivity extends AppCompatActivity {
 
         indexRow = rowTarget - indexRowTarget;
         indexCol = colTarget - indexColTarget;
-        //flagInterrupt = false;
         countStep1 = countStep - 1;
 
         if(indexRow >= 0 && indexCol >= 0 && indexRow < rowBoard && indexCol < colBoard) {
@@ -735,8 +700,7 @@ public class MainActivity extends AppCompatActivity {
                     }
             }
             if (indexRow >= 0 && indexCol >= 0 && indexRow < rowBoard && indexCol < colBoard) {
-              //  if(cellBoard[indexRow][indexCol] == playerTarget && flagInterrupt && flagAttack)
-              //      countStep = countStep1;
+
 
                 while (cellBoard[indexRow][indexCol] == playerTarget || cellBoard[indexRow][indexCol] == -playerTarget) {
 
@@ -745,68 +709,16 @@ public class MainActivity extends AppCompatActivity {
 
                     if (cellBoard[indexRow][indexCol] == playerTarget ){
                         countStep++;
-                      //  countStep1 ++;
-                      //  score += kScore;
+
                     }
 
                     indexRow -= indexRowTarget;
                     indexCol -= indexColTarget;
 
-                /*    if (countStep >= winTotal - 2 ) {
-                        if(countStep == winTotal - 2)
-                            score += 1000;
-                        if(countStep == winTotal - 1 )
-                            score += 5000;
-                        //score += (countStep - winTotal + 3) * 1000;
-                        if(!flagSpace)
-                            score += kScore*1000;
-
-
-
-                        if (countStep == winTotal) {
-                            score += kScore * 100000;
-                          //  if(flagAttack)
-                          //      countStep++;
-
-                        }
-
-
-                    } */
                     if (indexRow < 0 || indexCol < 0 || indexRow >= rowBoard || indexCol >= colBoard)
                         break;
                     else if (cellBoard[indexRow][indexCol] == -cellBoard[indexRow + indexRowTarget][indexCol + indexColTarget]) {
-                     /*
-                        if (countStep >= winTotal - 2) {
-                            if(countStep == winTotal - 2  && flagAttack){
-                                score -= (countStep - winTotal + 3 )*1000;
-                                countStep = 1;
-                            }
 
-                            if((countStep == winTotal -1  || countStep == winTotal -2  )&& !flagAttack){
-                                score -= (countStep - winTotal + 3 )*1000;
-                                countStep = 1;
-                            }
-
-                            if(countStep == winTotal && countStep1 != 0){
-                                score -= kScore*10000;
-                                countStep = 1;
-                            }
-
-                          //  if(countStep<=winTotal-1)
-                           //     countStep -= 2;
-
-
-                        }
-
-
-
-
-                        if (countStep == winTotal)
-                            score += kScore*100000;
-
-
-                       */
-                        flagInterrupt = true;
                         flagInterrupt2 = true;
                         break;
 
@@ -851,13 +763,12 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (countStep >= winTotal) {
-                if (flagAttack)
-                    score += 10000000;
-                if (!flagAttack)
-                    score += 10000000;
+                    score += 1000000;
                 if(countStep1 == winTotal + 1)
-                    if((countStep1 == winTotal - 3 && countStep1 == winTotal -2) || (countStep2 == winTotal -2 && countStep2 == winTotal - 3) || (countStep1 == winTotal -1 && countStep2 == winTotal - 4) || (countStep1 == winTotal -4 && countStep2 == winTotal -1))
+                    if((countStep1 == winTotal -1 && countStep2 == winTotal - 4) || (countStep1 == winTotal - 4 && countStep2 == winTotal - 1))
                         score += 10000000;
+                    if((countStep1 == winTotal - 3 && countStep2 == winTotal -2) || (countStep1 == winTotal -2 && countStep2 == winTotal - 3) )
+                        score += 20000000;
             }
 
             if(flagSpace)
