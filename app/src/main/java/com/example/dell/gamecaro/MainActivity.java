@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-            return (amountDefense>=amountAttack)&&(amountDefense>=5) ? resultDefense : resultAttack;
+            return (amountDefense>=amountAttack)&&(amountDefense>=winTotal-1) ? resultDefense : resultAttack;
         }
 
         protected void onPostExecute(Cell c){
@@ -172,6 +172,9 @@ public class MainActivity extends AppCompatActivity {
             arrayCell[c.rowCell][c.columnCell].setText("O");
             arrayCell[c.rowCell][c.columnCell].setTextColor(Color.BLACK);
             preCell = arrayCell[c.rowCell][c.columnCell];
+
+
+
             arrayCell[c.rowCell][c.columnCell].player = -1;
             cellBoard[c.rowCell][c.columnCell] = -1;
                 buttonNewGame.setText("Attack: "+amountAttack+" --- "+"Defense: "+amountDefense );
@@ -618,11 +621,15 @@ public class MainActivity extends AppCompatActivity {
         int indexRow = rowTarget + indexRowTarget;
         int indexCol = colTarget + indexColTarget;
         int score = 1;
-        int kScore = 5;
+        int kScore = 10;
         int countStep;
         int playerTarget;
         boolean flagSpace = false;
         boolean flagInterrupt = false;
+        boolean flagInterrupt1 = false;
+        boolean flagInterrupt2 = false;
+        int countStep1 = 0;
+        int countStep2 = 0;
         if(flagAttack){
             playerTarget = player;
             countStep = 1;
@@ -634,105 +641,269 @@ public class MainActivity extends AppCompatActivity {
             score = kScore;
         }
 
-
-
         if(indexRow >= 0 && indexCol >= 0 && indexRow < rowBoard && indexCol < colBoard) {
+            if (cellBoard[indexRow][indexCol] == 0 /*&& !flagAttack*/) {
+                indexRow += indexRowTarget;
+                indexCol += indexColTarget;
+                if (indexRow >= 0 && indexCol >= 0 && indexRow < rowBoard && indexCol < colBoard)
+                    if (cellBoard[indexRow][indexCol] == playerTarget) {
+
+                        flagSpace = true;
+                    }
+            }
+
+            if (indexRow >= 0 && indexCol >= 0 && indexRow < rowBoard && indexCol < colBoard) {
+
 
                 while (cellBoard[indexRow][indexCol] == playerTarget || cellBoard[indexRow][indexCol] == -playerTarget) {
 
-                           score += kScore;
-                    if (cellBoard[indexRow][indexCol] == playerTarget && !flagInterrupt)
+                        score += kScore;
+                    if (cellBoard[indexRow][indexCol] == playerTarget ){
                         countStep++;
+                    }
 
 
                     indexRow += indexRowTarget;
                     indexCol += indexColTarget;
 
-                    if (countStep >= winTotal - 2 && !flagInterrupt) {
-                        score +=  (countStep - winTotal + 3) * 100000;
+                 /*   if (countStep >= winTotal - 2 ) {
+                      //  score += (countStep - winTotal + 3) * 1000;
+                        if(countStep == winTotal - 2)
+                            score += 1000;
+                        if(countStep == winTotal - 1 )
+                            score += 5000;
+                        if(!flagSpace)
+                            score += kScore*1000;
 
-                        if (countStep == winTotal) {
-                            score += kScore * 100000;
-                            if(!flagSpace)
-                                countStep += 100;
-                        }
+                        if (countStep == winTotal)
+                            score += kScore* 100000;
+
 
                     }
-
-
+                    */
+                     //   countStep1 = countStep;
                     if (indexRow < 0 || indexCol < 0 || indexRow >= rowBoard || indexCol >= colBoard)
                         break;
                     else if (cellBoard[indexRow][indexCol] == -cellBoard[indexRow - indexRowTarget][indexCol - indexColTarget]) {
 
-                        if (countStep >= winTotal - 2  ) {
-                            score -=  20000;
-                            countStep --;
+                     /*   if (countStep >= winTotal - 2) {
+                         //   countStep1 = countStep;
+
+                            if(countStep == winTotal - 2 && flagAttack){
+                                score -= (countStep - winTotal + 3)*1000;
+                                countStep = 1;
+                            }
+
+                            if((countStep == winTotal - 2 || countStep == winTotal -1 ) && !flagAttack){
+                                score -= (countStep - winTotal +3)*1000;
+                                countStep = 1;
+                            }
+
+
+                        } */
+                        flagInterrupt1 = true;
+                      //  flagInterrupt = true;
+
+                        break;
+
+                    } else if(cellBoard[indexRow][indexCol] == 0 /*&& flagAttack*/){
+                        if (indexRow + indexRowTarget < 0 || indexCol + indexColTarget < 0 || indexRow + indexRowTarget >= rowBoard || indexCol + indexColTarget >= colBoard)
+                            break;
+                        else
+                        if(cellBoard[indexRow+indexRowTarget][indexCol+indexColTarget] == playerTarget){
+                            indexRow += indexRowTarget;
+                            indexCol += indexColTarget;
+                            flagSpace = true;
                         }
-
-                        flagInterrupt = true;
-
                     }
-                }
-        }
-
-        indexRow = rowTarget - indexRowTarget;
-        indexCol = colTarget - indexColTarget;
-
-        if(indexRow >= 0 && indexCol >= 0 && indexRow < rowBoard && indexCol < colBoard) {
-
-            while (cellBoard[indexRow][indexCol] == playerTarget || cellBoard[indexRow][indexCol] == -playerTarget) {
-
-                score += kScore;
-
-                if (cellBoard[indexRow][indexCol] == playerTarget && !flagInterrupt)
-                    countStep++;
-
-                indexRow -= indexRowTarget;
-                indexCol -= indexColTarget;
-
-                if (countStep >= winTotal - 2 && !flagInterrupt) {
-                    score += (countStep - winTotal + 3) * 100000;
-
-                    if (countStep == winTotal) {
-                        score += kScore * 100000;
-                        if (!flagSpace)
-                            countStep += 100;
-                    }
-
-
-                }
-
-                if (indexRow < 0 || indexCol < 0 || indexRow >= rowBoard || indexCol >= colBoard)
-                    break;
-                else if (cellBoard[indexRow][indexCol] == -cellBoard[indexRow + indexRowTarget][indexCol + indexColTarget]) {
-
-                    if (countStep >= winTotal - 2) {
-
-                        score -= 20000;
-                        countStep--;
-
-
-                    }
-
-
-                    if (countStep == winTotal)
-                        countStep += 100;
-
-                    flagInterrupt = true;
-
                 }
             }
         }
 
-        if(!flagAttack)
-            countStep --;
+        indexRow = rowTarget - indexRowTarget;
+        indexCol = colTarget - indexColTarget;
+        //flagInterrupt = false;
+        countStep1 = countStep - 1;
+
+        if(indexRow >= 0 && indexCol >= 0 && indexRow < rowBoard && indexCol < colBoard) {
+            if (cellBoard[indexRow][indexCol] == 0 /*&& !flagAttack*/ && !flagSpace) {
+                indexRow -= indexRowTarget;
+                indexCol -= indexColTarget;
+                if (indexRow >= 0 && indexCol >= 0 && indexRow < rowBoard && indexCol < colBoard)
+                    if (cellBoard[indexRow][indexCol] == playerTarget) {
+                        flagSpace = true;
+                    }
+            }
+            if (indexRow >= 0 && indexCol >= 0 && indexRow < rowBoard && indexCol < colBoard) {
+              //  if(cellBoard[indexRow][indexCol] == playerTarget && flagInterrupt && flagAttack)
+              //      countStep = countStep1;
+
+                while (cellBoard[indexRow][indexCol] == playerTarget || cellBoard[indexRow][indexCol] == -playerTarget) {
+
+                       score += kScore;
+
+
+                    if (cellBoard[indexRow][indexCol] == playerTarget ){
+                        countStep++;
+                      //  countStep1 ++;
+                      //  score += kScore;
+                    }
+
+                    indexRow -= indexRowTarget;
+                    indexCol -= indexColTarget;
+
+                /*    if (countStep >= winTotal - 2 ) {
+                        if(countStep == winTotal - 2)
+                            score += 1000;
+                        if(countStep == winTotal - 1 )
+                            score += 5000;
+                        //score += (countStep - winTotal + 3) * 1000;
+                        if(!flagSpace)
+                            score += kScore*1000;
+
+
+
+                        if (countStep == winTotal) {
+                            score += kScore * 100000;
+                          //  if(flagAttack)
+                          //      countStep++;
+
+                        }
+
+
+                    } */
+                    if (indexRow < 0 || indexCol < 0 || indexRow >= rowBoard || indexCol >= colBoard)
+                        break;
+                    else if (cellBoard[indexRow][indexCol] == -cellBoard[indexRow + indexRowTarget][indexCol + indexColTarget]) {
+                     /*
+                        if (countStep >= winTotal - 2) {
+                            if(countStep == winTotal - 2  && flagAttack){
+                                score -= (countStep - winTotal + 3 )*1000;
+                                countStep = 1;
+                            }
+
+                            if((countStep == winTotal -1  || countStep == winTotal -2  )&& !flagAttack){
+                                score -= (countStep - winTotal + 3 )*1000;
+                                countStep = 1;
+                            }
+
+                            if(countStep == winTotal && countStep1 != 0){
+                                score -= kScore*10000;
+                                countStep = 1;
+                            }
+
+                          //  if(countStep<=winTotal-1)
+                           //     countStep -= 2;
+
+
+                        }
+
+
+
+
+                        if (countStep == winTotal)
+                            score += kScore*100000;
+
+
+                       */
+                        flagInterrupt = true;
+                        flagInterrupt2 = true;
+                        break;
+
+                    } else if(cellBoard[indexRow][indexCol] == 0 ){
+                        if (indexRow - indexRowTarget < 0 || indexCol - indexColTarget < 0 || indexRow - indexRowTarget >= rowBoard || indexCol - indexColTarget >= colBoard)
+                            break;
+                        else
+                        if(cellBoard[indexRow-indexRowTarget][indexCol-indexColTarget] == playerTarget){
+                            indexRow -= indexRowTarget;
+                            indexCol -= indexColTarget;
+                            flagSpace = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        countStep2 = countStep - countStep1 - 1;
+
+        if(!flagInterrupt1 && !flagInterrupt2)
+            flagInterrupt = false;
+        else
+            flagInterrupt = true;
+
+        if (countStep >= winTotal - 2) {
+            if (countStep == winTotal - 2) {
+                if (flagAttack && !flagInterrupt)
+                    score += 1000;
+
+                // countStep = 1;
+            }
+
+            if (countStep == winTotal - 1) {
+                if (flagAttack && !flagInterrupt)
+                    score += 50000;
+                if ((flagAttack && (flagInterrupt1 && !flagInterrupt2)) || (flagAttack && (!flagInterrupt1 && flagInterrupt2)))
+                    score += 10000;
+
+                if (!flagAttack && !flagInterrupt)
+                    score += 10000;
+
+            }
+
+            if (countStep >= winTotal) {
+                if (flagAttack)
+                    score += 10000000;
+                if (!flagAttack)
+                    score += 10000000;
+                if(countStep1 == winTotal + 1)
+                    if((countStep1 == winTotal - 3 && countStep1 == winTotal -2) || (countStep2 == winTotal -2 && countStep2 == winTotal - 3) || (countStep1 == winTotal -1 && countStep2 == winTotal - 4) || (countStep1 == winTotal -4 && countStep2 == winTotal -1))
+                        score += 10000000;
+            }
+
+            if(flagSpace)
+                score -= 500;
+
+
+        }
+        /*
+
+            if((countStep == winTotal -1  || countStep == winTotal -2  )&& !flagAttack){
+                score -= (countStep - winTotal + 3 )*1000;
+                countStep = 1;
+            }
+
+            if(countStep == winTotal && countStep1 != 0){
+                score -= kScore*10000;
+                countStep = 1;
+            }
+
+
+
+        }
+
+
+        if(!flagSpace)
+            score +=  10000;
+        if(countStep<winTotal-2 && flagSpace && flagAttack)
+            score = -10000;
+
+       // if(flagInterrupt1 && flagInterrupt2 && countStep < winTotal && flagAttack)
+        //    score = 0;
+
+        if(countStep >= winTotal && !flagSpace)
+            countStep += 100;
+
+       if(!flagAttack && !flagInterrupt && countStep >= winTotal)
+           countStep += 50;
+
+            */
 
         if(flagAttack){
             amountAttack = countStep >= amountAttack ? countStep : amountAttack;
 
         } else {
 
-            amountDefense = countStep >= amountDefense ? countStep  : amountDefense;
+            amountDefense = countStep >= amountDefense ? countStep   : amountDefense;
         }
 
 
