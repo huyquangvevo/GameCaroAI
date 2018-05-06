@@ -605,10 +605,10 @@ public class MainActivity extends AppCompatActivity {
 
                    score += 100000;
 
-                 if(countStep == winTotal /* !flagAtack */)
+                 if(countStep == winTotal && !flagAttack )
                      if((countStep1 == 1 && countStep2 == 3)||(countStep1 == 3 && countStep2 == 1)||(countStep1 == 2 && countStep2 == 2) )
                          score += 1000000;
-                if(countStep >= winTotal + 1) {
+                if(countStep >= winTotal + 1 && !flagAttack) {
                     if((countStep1 == winTotal -1 && countStep2 != 0) || (countStep1 != 0 && countStep2 == winTotal - 1))
                         score += 10000000;
                     if((countStep1 != 0 && countStep2 == winTotal -2) || (countStep1 == winTotal -2 && countStep2 != 0) )
