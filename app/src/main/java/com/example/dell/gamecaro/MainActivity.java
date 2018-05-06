@@ -21,8 +21,8 @@ public class MainActivity extends AppCompatActivity {
 
     LinearLayout chessBoardLayout;
     Button buttonNewGame;
-    static final int rowBoard = 20;
-    static final int colBoard = 20;
+    static final int rowBoard = 18;
+    static final int colBoard = 18;
     final int winTotal = 5;
     static Cell[][] arrayCell ;
     static int[][] cellBoard;
@@ -370,7 +370,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if(level % 2 == 0 && level != depth){
-            int maxScore = -40000000;
+            int maxScore = -10000000;
             int scoreCache = 0;
             cellBoard[cell.rowCell][cell.columnCell] = 1;
             for(int i=0;i<rowBoard;i++)
@@ -388,16 +388,25 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
+            result = maxScore;
+            result += getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,1,1,flagAttack)
+                    + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,1,0,flagAttack)
+                    + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,-1,1,flagAttack)
+                    + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,0,1,flagAttack);
+
+
             cellBoard[cell.rowCell][cell.columnCell] = 0;
             if(maxScore<preMIN)
                 preMIN = maxScore;
-            result = maxScore;
+           // if(result<preMIN)
+            //    preMIN = result;
+
         }
 
-        if(level % 2 == 1 ){
+        if(level % 2 == 1 && level != depth){
 
 
-            int minScore = 400000000;
+            int minScore = 100000000;
             int scoreCache = 0;
 
             cellBoard[cell.rowCell][cell.columnCell] = -1;
@@ -416,18 +425,20 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-
-
-            cellBoard[cell.rowCell][cell.columnCell] = 0;
-            if(minScore>preMAX)
-                preMAX = minScore;
-
             result = minScore;
-            if(level == 1)
             result += getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,1,1,flagAttack)
                     + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,1,0,flagAttack)
                     + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,-1,1,flagAttack)
                     + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,0,1,flagAttack);
+
+            cellBoard[cell.rowCell][cell.columnCell] = 0;
+            if(minScore>preMAX)
+                preMAX = minScore;
+          //  if(result>preMAX)
+           //     preMAX = result;
+
+
+
         }
 
 
@@ -444,7 +455,7 @@ public class MainActivity extends AppCompatActivity {
         int indexRow = rowTarget + indexRowTarget;
         int indexCol = colTarget + indexColTarget;
         int score = 1;
-        int kScore = 10;
+        int kScore = 1;
         int countStep;
         int playerTarget;
         boolean flagSpace = false;
@@ -456,7 +467,7 @@ public class MainActivity extends AppCompatActivity {
         if(flagAttack){
             playerTarget = player;
             countStep = 1;
-            score = kScore;//+1;
+            score = kScore;
         }
         else{
             playerTarget = - player;
@@ -499,7 +510,7 @@ public class MainActivity extends AppCompatActivity {
 
                         break;
 
-                    } else if(cellBoard[indexRow][indexCol] == 0 /*&& flagAttack*/){
+                    } else if(cellBoard[indexRow][indexCol] == 0 && !flagSpace){
                         if (indexRow + indexRowTarget < 0 || indexCol + indexColTarget < 0 || indexRow + indexRowTarget >= rowBoard || indexCol + indexColTarget >= colBoard)
                             break;
                         else
@@ -518,7 +529,7 @@ public class MainActivity extends AppCompatActivity {
         countStep1 = countStep - 1;
 
         if(indexRow >= 0 && indexCol >= 0 && indexRow < rowBoard && indexCol < colBoard) {
-            if (cellBoard[indexRow][indexCol] == 0 /*&& !flagAttack*/ && !flagSpace) {
+            if (cellBoard[indexRow][indexCol] == 0 && !flagSpace) {
                 indexRow -= indexRowTarget;
                 indexCol -= indexColTarget;
                 if (indexRow >= 0 && indexCol >= 0 && indexRow < rowBoard && indexCol < colBoard)
@@ -549,7 +560,7 @@ public class MainActivity extends AppCompatActivity {
                         flagInterrupt2 = true;
                         break;
 
-                    } else if(cellBoard[indexRow][indexCol] == 0 ){
+                    } else if(cellBoard[indexRow][indexCol] == 0 && !flagSpace ){
                         if (indexRow - indexRowTarget < 0 || indexCol - indexColTarget < 0 || indexRow - indexRowTarget >= rowBoard || indexCol - indexColTarget >= colBoard)
                             break;
                         else
@@ -573,32 +584,39 @@ public class MainActivity extends AppCompatActivity {
         if (countStep >= winTotal - 2) {
             if (countStep == winTotal - 2) {
                 if (flagAttack && !flagInterrupt)
-                    score += 1000;
+                    score += 100;
+
             }
 
             if (countStep == winTotal - 1) {
                 if (flagAttack && !flagInterrupt)
-                    score += 50000;
+                    score += 5000;
                 if ((flagAttack && (flagInterrupt1 && !flagInterrupt2)) || (flagAttack && (!flagInterrupt1 && flagInterrupt2)))
-                    score += 10000;
+                    score += 1000;
 
                 if (!flagAttack && !flagInterrupt)
-                    score += 10000;
+                    score += 1000;
+
+
 
             }
 
             if (countStep >= winTotal) {
-                    score += 1000000;
-                if(countStep1 == winTotal + 1)
-                  /*  if((countStep1 == winTotal -1 && countStep2 == winTotal - 4) || (countStep1 == winTotal - 4 && countStep2 == winTotal - 1))
+
+                   score += 100000;
+
+                 if(countStep == winTotal && !flagAttack)
+                     if((countStep1 == 1 && countStep2 == 3)||(countStep1 == 3 && countStep2 == 1)||(countStep1 == 2 && countStep2 == 2) )
+                         score += 1000000;
+                if(countStep >= winTotal + 1) {
+                    if((countStep1 == winTotal -1 && countStep2 != 0) || (countStep1 != 0 && countStep2 == winTotal - 1))
                         score += 10000000;
-                    if((countStep1 == winTotal - 3 && countStep2 == winTotal -2) || (countStep1 == winTotal -2 && countStep2 == winTotal - 3) )
+                    if((countStep1 != 0 && countStep2 == winTotal -2) || (countStep1 == winTotal -2 && countStep2 != 0) )
                         score += 20000000;
-                    */
-                    if((countStep1 == winTotal - 1 && countStep2 >= 1)||(countStep1 >=1 && countStep2 == winTotal -1))
-                        score += 10000000;
-                    if((countStep1 == winTotal - 2 && countStep2 >= 2) || (countStep1 >= 2 && countStep2 == winTotal -2))
-                        score += 20000000;
+
+
+                }
+
             }
 
 
@@ -607,7 +625,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if(flagSpace)
-            score -= 500;
+            score -= 50;
 
         if(flagAttack){
             amountAttack = countStep >= amountAttack ? countStep : amountAttack;
