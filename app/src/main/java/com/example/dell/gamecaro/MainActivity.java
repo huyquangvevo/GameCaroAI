@@ -10,10 +10,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 
@@ -21,8 +22,8 @@ public class MainActivity extends AppCompatActivity {
 
     LinearLayout chessBoardLayout;
     Button buttonNewGame;
-    static final int rowBoard = 18;
-    static final int colBoard = 18;
+    static final int rowBoard = 30;
+    static final int colBoard = 30;
     final int winTotal = 5;
     static Cell[][] arrayCell ;
     static int[][] cellBoard;
@@ -36,8 +37,11 @@ public class MainActivity extends AppCompatActivity {
     boolean playing;
     boolean first;
 
-    ArrayList<Cell> playerCell;
-    ArrayList<Cell> machinceCell;
+    int minRowRange = 0;
+    int maxRowRange = rowBoard - 1;
+    int minColRange = 0;
+    int maxColRange = colBoard - 1;
+
 
     @SuppressLint("WrongConstant")
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +61,10 @@ public class MainActivity extends AppCompatActivity {
 
         chessBoardLayout = (LinearLayout) findViewById(R.id.chess_board_layout);
         buttonNewGame = (Button) findViewById(R.id.button_new_game);
+
+        HorizontalScrollView hScrollView = (HorizontalScrollView) findViewById(R.id.hScrollView);
+        ScrollView scrollView = (ScrollView) findViewById(R.id.scroll_view) ;
+
 
 
 
@@ -82,8 +90,8 @@ public class MainActivity extends AppCompatActivity {
                         arrayCell[rowBoard/2][colBoard/2].setTextColor(Color.BLACK);
                         preCell = arrayCell[rowBoard/2][colBoard/2];
                         cellBoard[rowBoard/2][colBoard/2] = -1;
-
                         first = false;
+
 
                     }
                 });
@@ -136,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
                                     first = false;
                                 }
                                 else {
+                                    setRange();
                                     Heuristic task = new Heuristic();
                                     task.execute();
                                     buttonNewGame.setText("AI Thinking...");
@@ -150,8 +159,6 @@ public class MainActivity extends AppCompatActivity {
             }
             chessBoardLayout.addView(l);
         }
-
-
 
 
     }
@@ -192,6 +199,14 @@ public class MainActivity extends AppCompatActivity {
 
             }
 
+
+        minRowRange = 0;
+        maxRowRange = rowBoard -1;
+        minColRange = 0;
+        maxColRange = colBoard -1;
+        preCell = null;
+
+
     };
 
     public void setResult(String result){
@@ -219,6 +234,70 @@ public class MainActivity extends AppCompatActivity {
 
     };
 
+    public void setRange(){
+        int preMinRow = minRowRange;
+        int preMaxRow = maxRowRange;
+        int preMinCol = minColRange;
+        int preMaxCol = maxColRange;
+
+        maxRowRange = 0;
+        minRowRange = rowBoard -1 ;
+        maxColRange = 0;
+        minColRange = colBoard -1 ;
+
+        for(int i=preMinRow;i<=preMaxRow;i++)
+            for(int j=preMinCol;j<=preMaxCol;j++)
+                if(arrayCell[i][j].player != 0){
+                    if(i>maxRowRange)
+                        maxRowRange = i;
+                    if(i<minRowRange)
+                        minRowRange = i;
+                    if(j>maxColRange)
+                        maxColRange = j;
+                    if(j<minColRange)
+                        minColRange = j;
+                }
+
+                int cache;
+        cache = minRowRange;
+        while (minRowRange-cache<5){
+            cache--;
+            if(cache < 0 ){
+                cache ++;
+                break;
+            }
+        }
+        minRowRange = cache;
+        cache = maxRowRange;
+        while (cache-maxRowRange<5){
+            cache++;
+            if(cache == rowBoard){
+                cache--;
+                break;
+            }
+        }
+        maxRowRange = cache;
+        cache = minColRange;
+        while (minColRange-cache<5){
+            cache--;
+            if(cache < 0){
+                cache++;
+                break;
+            }
+        }
+        minColRange = cache;
+        cache = maxColRange;
+        while (cache - maxColRange <5){
+            cache++;
+            if(cache == colBoard){
+                cache--;
+                break;
+            }
+        }
+        maxColRange = cache;
+
+    }
+
 
 
     private class Heuristic extends AsyncTask<Void, Void, Cell> {
@@ -233,8 +312,8 @@ public class MainActivity extends AppCompatActivity {
             Cell resultDefense = arrayCell[0][0];
             Cell resultAttack = arrayCell[0][0];
 
-            for(int i=0;i<rowBoard;i++)
-                for(int j=0;j<colBoard;j++){
+            for(int i=minRowRange;i<=maxRowRange;i++)
+                for(int j=minColRange;j<=maxRowRange;j++){
                     if(arrayCell[i][j].player == 0) {
 
                         attackScore = getMax(arrayCell[i][j],1,true);
@@ -249,8 +328,8 @@ public class MainActivity extends AppCompatActivity {
                 }
 
 
-            for(int i=0;i<rowBoard;i++)
-                for(int j=0;j<colBoard;j++){
+            for(int i=minRowRange;i<=maxRowRange;i++)
+                for(int j=minColRange;j<=maxColRange;j++){
                     if(arrayCell[i][j].player  == 0){
 
                         defenseScore = getMax(arrayCell[i][j],1,false);
@@ -373,8 +452,10 @@ public class MainActivity extends AppCompatActivity {
             int maxScore = -10000000;
             int scoreCache = 0;
             cellBoard[cell.rowCell][cell.columnCell] = 1;
-            for(int i=0;i<rowBoard;i++)
-                for (int j=0;j<colBoard;j++){
+           /* for(int i=0;i<rowBoard;i++)
+                for (int j=0;j<colBoard;j++)*/
+           for(int i=minRowRange;i<=maxRowRange;i++)
+           for (int j=minColRange;j<=maxColRange;j++){
                     if(cellBoard[i][j] == 0){
                         scoreCache = getMax(arrayCell[i][j],level+1,flagAttack);
 
@@ -411,8 +492,10 @@ public class MainActivity extends AppCompatActivity {
 
             cellBoard[cell.rowCell][cell.columnCell] = -1;
             previewCell = cell;
-            for(int i=0;i<rowBoard;i++)
-                for (int j=0;j<colBoard;j++){
+          /*  for(int i=0;i<rowBoard;i++)
+                for (int j=0;j<colBoard;j++)*/
+          for(int i=minRowRange;i<=maxRowRange;i++)
+            for(int j=minColRange;j<=maxColRange;j++){
                     if(cellBoard[i][j] == 0){
                         scoreCache = getMax(arrayCell[i][j],level+1,flagAttack);
                         if(scoreCache<=minScore){
@@ -604,7 +687,10 @@ public class MainActivity extends AppCompatActivity {
             if (countStep >= winTotal) {
 
                    score += 100000;
-
+                   if(countStep >= winTotal && !flagAttack)
+                       if((countStep1 >= winTotal - 2 && countStep2 != 0) || (countStep1 != 0 && countStep2 >= winTotal -2) || (countStep1>=2 && countStep2 >= 2))
+                           score += 1000000;
+                /*
                  if(countStep == winTotal && !flagAttack )
                      if((countStep1 == 1 && countStep2 == 3)||(countStep1 == 3 && countStep2 == 1)||(countStep1 == 2 && countStep2 == 2) )
                          score += 1000000;
@@ -615,7 +701,7 @@ public class MainActivity extends AppCompatActivity {
                         score += 20000000;
 
 
-                }
+                }*/
 
             }
 

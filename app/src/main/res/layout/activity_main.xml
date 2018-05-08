@@ -18,6 +18,7 @@
         android:textColor="@android:color/white" />
 
     <HorizontalScrollView
+        android:id="@+id/hScrollView"
         android:layout_width="match_parent"
         android:layout_height="466dp"
         android:layout_weight="0.05">
@@ -28,6 +29,7 @@
             android:orientation="vertical">
 
             <ScrollView
+                android:id="@+id/scroll_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
