@@ -298,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
+    int valueMAX;
 
     private class Heuristic extends AsyncTask<Void, Void, Cell> {
 
@@ -312,11 +312,21 @@ public class MainActivity extends AppCompatActivity {
             Cell resultDefense = arrayCell[0][0];
             Cell resultAttack = arrayCell[0][0];
 
+          //  boolean theFirst = true;
+           // preMAX = -1000000000;
+            boolean theFirst = true;
+            valueMAX = -1000;
+
             for(int i=minRowRange;i<=maxRowRange;i++)
                 for(int j=minColRange;j<=maxRowRange;j++){
                     if(arrayCell[i][j].player == 0) {
+                        previewCell = arrayCell[i][j];
 
                         attackScore = getMax(arrayCell[i][j],1,true);
+                        if(theFirst){
+                            valueMAX = attackScore;
+                            theFirst=false;
+                        }
 
                         if(attackScore >= maxAttack){
                             resultAttack = arrayCell[i][j];
@@ -327,13 +337,20 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
+            preMAX = -1000000000;
+            preMIN = 1000000000;
+
+            theFirst = true;
 
             for(int i=minRowRange;i<=maxRowRange;i++)
                 for(int j=minColRange;j<=maxColRange;j++){
                     if(arrayCell[i][j].player  == 0){
-
+                        previewCell = arrayCell[i][j];
                         defenseScore = getMax(arrayCell[i][j],1,false);
-
+                       if(theFirst){
+                           valueMAX = defenseScore;
+                           theFirst = false;
+                       }
                         if(defenseScore >= maxDefense){
                            resultDefense = arrayCell[i][j];
                             maxDefense = defenseScore;
@@ -344,8 +361,9 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-
-               return ((amountDefense>=amountAttack)&&(amountDefense>=winTotal-1)&&(maxDefense>=maxAttack)) ? resultDefense : resultAttack;
+              //  return resultDefense;
+            //return resultAttack;
+               return ((amountDefense>=amountAttack-1)&&(amountDefense>=winTotal-1)&&(maxDefense>=maxAttack)) ? resultDefense : resultAttack;
         }
 
         protected void onPostExecute(Cell c){
@@ -436,12 +454,14 @@ public class MainActivity extends AppCompatActivity {
         int result = 0;
 
         if(level == depth ){
-
+            if(depth % 2 == 1)
             cellBoard[cell.rowCell][cell.columnCell] = -1;
-                      int  scoreCache = getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,1,1,flagAttack)
-                                + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,1,0,flagAttack)
-                                + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,-1,1,flagAttack)
-                                + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,0,1,flagAttack);
+            else
+                cellBoard[cell.rowCell][cell.columnCell] = 1;
+            int  scoreCache = getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,1,1,flagAttack)
+                    + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,1,0,flagAttack)
+                    + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,-1,1,flagAttack)
+                    + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,0,1,flagAttack);
 
             cellBoard[cell.rowCell][cell.columnCell] = 0;
             return scoreCache;
@@ -452,18 +472,24 @@ public class MainActivity extends AppCompatActivity {
             int maxScore = -10000000;
             int scoreCache = 0;
             cellBoard[cell.rowCell][cell.columnCell] = 1;
-           /* for(int i=0;i<rowBoard;i++)
-                for (int j=0;j<colBoard;j++)*/
-           for(int i=minRowRange;i<=maxRowRange;i++)
-           for (int j=minColRange;j<=maxColRange;j++){
+            boolean theFirst = true;
+            for(int i=minRowRange;i<=maxRowRange;i++)
+                for (int j=minColRange;j<=maxColRange;j++){
                     if(cellBoard[i][j] == 0){
+
+                        if(theFirst){
+                            preMIN = 1000000000;
+                            theFirst = false;
+                        }
+
                         scoreCache = getMax(arrayCell[i][j],level+1,flagAttack);
+
 
                         if(scoreCache>=maxScore){
                             maxScore = scoreCache;
                         }
                         if(scoreCache>preMIN){
-                           cellBoard[cell.rowCell][cell.columnCell] = 0;
+                            cellBoard[cell.rowCell][cell.columnCell] = 0;
                             return scoreCache;
                         }
                     }
@@ -477,10 +503,10 @@ public class MainActivity extends AppCompatActivity {
 
 
             cellBoard[cell.rowCell][cell.columnCell] = 0;
-            if(maxScore<preMIN)
-                preMIN = maxScore;
-           // if(result<preMIN)
-            //    preMIN = result;
+           // if(maxScore<preMIN)
+          //      preMIN = maxScore;
+             if(result<preMIN)
+                preMIN = result;
 
         }
 
@@ -491,20 +517,39 @@ public class MainActivity extends AppCompatActivity {
             int scoreCache = 0;
 
             cellBoard[cell.rowCell][cell.columnCell] = -1;
-            previewCell = cell;
-          /*  for(int i=0;i<rowBoard;i++)
-                for (int j=0;j<colBoard;j++)*/
-          for(int i=minRowRange;i<=maxRowRange;i++)
-            for(int j=minColRange;j<=maxColRange;j++){
+          //  previewCell = cell;
+            boolean theFirst = true;
+            for(int i=minRowRange;i<=maxRowRange;i++)
+                for(int j=minColRange;j<=maxColRange;j++){
                     if(cellBoard[i][j] == 0){
+                        if(theFirst){
+                            preMAX = -100000;
+                            theFirst = false;
+                        }
                         scoreCache = getMax(arrayCell[i][j],level+1,flagAttack);
                         if(scoreCache<=minScore){
                             minScore = scoreCache;
                         }
+
+
                         if(scoreCache<preMAX){
                             cellBoard[cell.rowCell][cell.columnCell] = 0;
                             return  scoreCache;
                         }
+
+                        if(level == 1){
+                            int extra = scoreCache + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,1,1,flagAttack)
+                                    + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,1,0,flagAttack)
+                                    + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,-1,1,flagAttack)
+                                    + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,0,1,flagAttack);
+                            if(extra<valueMAX){
+                                cellBoard[cell.rowCell][cell.columnCell] = 0;
+                                return extra;
+                            }
+
+                        }
+
+
                     }
                 }
 
@@ -515,10 +560,12 @@ public class MainActivity extends AppCompatActivity {
                     + getScoreExtra(previewCell.rowCell,previewCell.columnCell,-1,0,1,flagAttack);
 
             cellBoard[cell.rowCell][cell.columnCell] = 0;
-            if(minScore>preMAX)
-                preMAX = minScore;
-          //  if(result>preMAX)
-           //     preMAX = result;
+
+              if(result>preMAX)
+                 preMAX = result;
+
+              if(level == 1 && result > valueMAX)
+                  valueMAX = result;
 
 
 
@@ -527,6 +574,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         return result;
+
 
     }
 
@@ -559,7 +607,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if(indexRow >= 0 && indexCol >= 0 && indexRow < rowBoard && indexCol < colBoard) {
-            if (cellBoard[indexRow][indexCol] == 0 /*&& !flagAttack*/) {
+            if (cellBoard[indexRow][indexCol] == 0 ) {
                 indexRow += indexRowTarget;
                 indexCol += indexColTarget;
                 if (indexRow >= 0 && indexCol >= 0 && indexRow < rowBoard && indexCol < colBoard)
@@ -663,6 +711,8 @@ public class MainActivity extends AppCompatActivity {
             flagInterrupt = false;
         else
             flagInterrupt = true;
+       // if(flagAttack)
+       //     score += countStep*10;
 
         if (countStep >= winTotal - 2) {
             if (countStep == winTotal - 2) {
@@ -686,10 +736,15 @@ public class MainActivity extends AppCompatActivity {
 
             if (countStep >= winTotal) {
 
-                   score += 100000;
-                   if(countStep >= winTotal && !flagAttack)
+                   score += 500000;
+                   if(countStep >= winTotal && !flagAttack){
                        if((countStep1 >= winTotal - 2 && countStep2 != 0) || (countStep1 != 0 && countStep2 >= winTotal -2) || (countStep1>=2 && countStep2 >= 2))
                            score += 1000000;
+                        if(((countStep1 >= 3 )&&(countStep2 >= 2))||((countStep1 >= 2)&&(countStep2>=3)))
+                           score += 100000;
+                   }
+                   if(countStep == winTotal+1 && flagAttack)
+                       score += 2000000;
                 /*
                  if(countStep == winTotal && !flagAttack )
                      if((countStep1 == 1 && countStep2 == 3)||(countStep1 == 3 && countStep2 == 1)||(countStep1 == 2 && countStep2 == 2) )
